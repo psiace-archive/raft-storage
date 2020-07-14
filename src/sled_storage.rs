@@ -1,38 +1,14 @@
 use std::path::Path;
 
-#[cfg(feature = "prostmsg")]
 use prost::Message;
-
 use raft::prelude::*;
 use raft::{Error as RaftError, RaftState, Storage, StorageError};
 use sled::{open, Db};
 use slog::{info, Logger};
 
+use crate::error::CustomStorageError;
 use crate::state::StorageRaftState;
 use crate::utils::*;
-use crate::CustomStorageError;
-
-pub fn get<K, V>(db: &Db, k: K) -> Result<V, CustomStorageError>
-where
-    K: AsRef<[u8]>,
-    V: Message + Default,
-{
-    if let Ok(Some(v)) = db.get(k) {
-        decode(v.as_ref())
-    } else {
-        Ok(V::default())
-    }
-}
-
-pub fn insert<K, V>(db: &Db, k: K, v: V) -> Result<(), CustomStorageError>
-where
-    K: AsRef<[u8]>,
-    V: Message,
-{
-    let buf = encode(v)?;
-    db.insert(k, &buf[..])?;
-    Ok(())
-}
 
 pub struct SledStorage {
     state: StorageRaftState,

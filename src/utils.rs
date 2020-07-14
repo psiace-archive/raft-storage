@@ -1,10 +1,32 @@
-use bytes::BytesMut;
 use std::convert::TryInto;
 
-#[cfg(feature = "prostmsg")]
+use bytes::BytesMut;
 use prost::Message;
+use sled::Db;
 
-use crate::CustomStorageError;
+use crate::error::CustomStorageError;
+
+pub fn get<K, V>(db: &Db, k: K) -> Result<V, CustomStorageError>
+where
+    K: AsRef<[u8]>,
+    V: Message + Default,
+{
+    if let Ok(Some(v)) = db.get(k) {
+        decode(v.as_ref())
+    } else {
+        Ok(V::default())
+    }
+}
+
+pub fn insert<K, V>(db: &Db, k: K, v: V) -> Result<(), CustomStorageError>
+where
+    K: AsRef<[u8]>,
+    V: Message,
+{
+    let buf = encode(v)?;
+    db.insert(k, &buf[..])?;
+    Ok(())
+}
 
 pub fn read_be_u64(input: &mut &[u8]) -> u64 {
     let (int_bytes, rest) = input.split_at(std::mem::size_of::<u64>());
