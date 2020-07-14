@@ -1,0 +1,22 @@
+[package]
+name = "raft-storage"
+version = "0.1.0"
+authors = ["Chojan Shang <psiace@outlook.com>"]
+license = "Apache-2.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+raft          = { git = "https://github.com/tikv/raft-rs", default-features = false, optional = true }
+sled          = { version = "0.32", optional = true }
+bytes         = "^0.5"
+prost         = { version = "^0.6", optional = true }
+slog          = "^2.5"
+
+
+[features]
+default = ["prostmsg", "sled-storage"]
+
+prostmsg = ["prost", "raft/prost-codec"]
+sled-storage = ["sled"]
