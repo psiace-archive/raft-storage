@@ -11,7 +11,7 @@ use crate::state::StorageRaftState;
 use crate::utils::*;
 
 pub struct SledStorage {
-    state: StorageRaftState,
+    pub state: StorageRaftState,
     snapshot_metadata: SnapshotMetadata,
     db: Db,
     logger: Logger,
